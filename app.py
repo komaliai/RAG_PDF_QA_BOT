@@ -38,40 +38,64 @@ vectorstore = FAISS.load_local(
 # -----------------------
 st.title("📄 PDF Q&A Chatbot (RAG)")
 
-query = st.text_input("Ask a question from your PDF:")
+# -----------------------
+# CHAT MEMORY (IMPORTANT)
+# -----------------------
+if "messages" not in st.session_state:
+    st.session_state.messages = []
+
+# show chat history
+for msg in st.session_state.messages:
+    st.chat_message(msg["role"]).write(msg["content"])
+
+query = st.chat_input("Ask a question from your PDF...")
 
 if query:
 
-    docs = vectorstore.similarity_search(query, k=3)
+    # store user message
+    st.session_state.messages.append({"role": "user", "content": query})
+    st.chat_message("user").write(query)
 
-    st.subheader("🔎 Top Matching Chunks")
+    with st.spinner("Thinking... 🤔"):
 
-    context = ""
+        # -----------------------
+        # RETRIEVE DOCS
+        # -----------------------
+        docs = vectorstore.similarity_search(query, k=4)
 
-    for i, doc in enumerate(docs):
-        st.write(f"Chunk {i+1}")
-        st.write(doc.page_content)
-        context += doc.page_content + "\n"
+        # -----------------------
+        # SAFE CHECK FIRST
+        # -----------------------
+        if not docs:
+            answer = "I could not find the answer in the uploaded PDFs."
+        else:
+            # build context safely
+            context = "\n".join([doc.page_content for doc in docs])
 
-    prompt = f"""
+            prompt = f"""
 You are a PDF Question Answering Assistant.
 
-Answer ONLY from the provided context.
-
-If the answer is not available in the context, reply:
-"I could not find the answer in the uploaded PDFs."
+Rules:
+- Use ONLY the context below
+- Be accurate and concise
+- If answer not found, say: "I could not find the answer in the uploaded PDFs."
 
 Context:
 {context}
 
 Question:
 {query}
+
+Answer:
 """
 
-    response = client.responses.create(
-        model="gpt-4.1-mini",
-        input=prompt
-    )
+            response = client.responses.create(
+                model="gpt-4.1-mini",
+                input=prompt
+            )
 
-    st.subheader("🤖 Answer")
-    st.write(response.output_text)
+            answer = response.output_text
+
+    # store assistant message
+    st.session_state.messages.append({"role": "assistant", "content": answer})
+    st.chat_message("assistant").write(answer)
