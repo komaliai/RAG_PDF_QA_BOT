@@ -1,23 +1,24 @@
-📄 RAG PDF Question Answering Chatbot
-📌 Project Overview
+RAG PDF Question Answering Chatbot
+
+Project Overview
 
 This project is a Retrieval-Augmented Generation (RAG) chatbot that allows users to upload PDF documents and ask questions in natural language. The system retrieves the most relevant document chunks using FAISS and HuggingFace embeddings, then uses an OpenAI language model to generate accurate answers based on the retrieved context.
 
-🚀 Features
-PDF document loading
-Text chunking
-HuggingFace Embeddings (all-MiniLM-L6-v2)
-FAISS vector database
-Semantic similarity search
-OpenAI GPT for answer generation
-Streamlit web interface
+Features
+-PDF document loading
+-Text chunking
+-HuggingFace Embeddings (all-MiniLM-L6-v2)
+-FAISS vector database
+-Semantic similarity search
+-OpenAI GPT for answer generation
+-Streamlit web interface
 🛠️ Tech Stack
-Python
-LangChain
-HuggingFace Embeddings
-FAISS
-OpenAI API
-Streamlit
+-Python
+-LangChain
+-HuggingFace Embeddings
+-FAISS
+-OpenAI API
+-Streamlit
 📂 Project Structure
 RAG_PDF_QA_BOT/
 │── app.py
